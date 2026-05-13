@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投票统计后台</title>
+<link rel="stylesheet" href="admin.css?v=20260513">
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body>
+<header>
+  <h1>中干竞聘投票统计后台</h1>
+  <button id="refreshBtn">刷新数据</button>
+</header>
+
+<main>
+  <div id="summary">
+    <p>总参与人数：<span id="totalVoters">0</span></p>
+  </div>
+
+  <div id="results">
+    <!-- 候选人卡片动态生成 -->
+  </div>
+
+  <div id="chartContainer" style="margin-top:30px;">
+    <canvas id="votesChart"></canvas>
+  </div>
+</main>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="admin.js?v=20260513"></script>
+</body>
+</html>

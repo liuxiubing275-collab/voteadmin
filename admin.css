@@ -1,0 +1,83 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 10px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 1.5em;
+  color: #1e3a8a;
+}
+
+header button {
+  padding: 8px 15px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: none;
+  background-color: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+header button:hover {
+  background-color: #1e40af;
+}
+
+#summary {
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.candidate-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.candidate-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.candidate-info .name {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.candidate-info .position {
+  font-size: 0.95em;
+  color: #555;
+}
+
+.candidate-stats {
+  display: flex;
+  align-items: center;
+}
+
+.candidate-stats .votes {
+  margin-right: 15px;
+}
+
+.candidate-stats .rate {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+}
+
+.rate.green { background-color: #16a34a; } /* 高于50% */
+.rate.red { background-color: #dc2626; }   /* 低于50% */
