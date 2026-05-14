@@ -3,14 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>中干竞聘投票后台</title>
-<link rel="stylesheet" href="admin.css?v=20260515">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<title>中干竞聘投票后台满屏显示</title>
+<style>
+/* ========= 全屏布局样式 ========= */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  overflow: hidden; /* 去掉滚动条 */
+}
+
+header {
+  text-align: center;
+  padding: 10px;
+  background: #1e3a8a;
+  color: white;
+  font-size: 1.8em;
+}
+
+#manualInput {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+#manualInput input { width: 80px; padding: 5px; }
+
+#manualInput button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  background-color: #16a34a;
+  color: white;
+  cursor: pointer;
+}
+
+#manualInput button:hover { background-color: #15803d; }
+
+#summary { text-align: center; font-size: 1.2em; margin-bottom: 10px; }
+
+#results {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+  height: calc(100% - 140px); /* 顶部header +手动输入+summary */
+  overflow: hidden;
+}
+
+/* 每个岗位分组 */
+.candidate-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 300px; /* 自适应宽度 */
+  min-width: 250px;
+}
+
+/* 岗位标题 */
+.group-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 8px;
+  color:#1e3a8a;
+  text-align: center;
+}
+
+/* 候选人卡片 */
+.candidate-card {
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 卡片内部 */
+.candidate-info { display: flex; flex-direction: column; }
+.candidate-info .name { font-weight: bold; font-size: 1em; }
+.candidate-info .position { font-size: 0.9em; color: #555; }
+
+.candidate-stats { display: flex; align-items: center; gap: 10px; }
+.candidate-stats .votes {}
+.candidate-stats .rate { font-weight: bold; padding: 4px 8px; border-radius: 4px; color:white; }
+.rate.green { background-color: #16a34a; }
+.rate.red { background-color: #dc2626; }
+
+/* 登录遮罩 */
+#loginOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.85);
+  display:flex; justify-content:center; align-items:center;
+  z-index: 9999;
+}
+.login-box {
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:300px;
+  text-align:center;
+}
+.login-box h2 { margin-bottom:20px; }
+.login-box input { width:100%; padding:12px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+.login-box button { width:100%; padding:12px; border:none; border-radius:6px; background:#2563eb; color:white; font-size:16px; cursor:pointer; }
+.login-box button:hover { background:#1e40af; }
+</style>
 </head>
 <body>
 
-<!-- 登录遮罩 -->
+<!-- 登录 -->
 <div id="loginOverlay">
   <div class="login-box">
     <h2>后台登录</h2>
@@ -19,36 +128,121 @@
   </div>
 </div>
 
-<header>
-  <h1>中干竞聘投票统计后台</h1>
-  <div class="header-btns">
-    <button id="refreshBtn">刷新数据</button>
-    <button id="resetBtn">复位投票</button>
-  </div>
-</header>
+<header>中干竞聘投票统计满屏显示后台</header>
 
-<main>
-  <div id="manualInput">
-    <label>手动输入参与人数：</label>
-    <input type="number" id="manualVoterInput" min="0">
-    <button id="confirmVoterBtn">确认</button>
-    <span id="manualInfo"></span>
-  </div>
+<div id="manualInput">
+  <label>手动输入参与人数：</label>
+  <input type="number" id="manualVoterInput" min="0">
+  <button id="confirmVoterBtn">确认</button>
+  <span id="manualInfo"></span>
+  <button id="resetBtn">复位投票</button>
+  <button id="refreshBtn">刷新数据</button>
+</div>
 
-  <div id="summary">
-    <p>总参与人数：<span id="totalVoters">0</span></p>
-  </div>
+<div id="summary">
+  总参与人数：<span id="totalVoters">0</span>
+</div>
 
-  <div id="results">
-    <!-- 候选人卡片动态生成 -->
-  </div>
-
-  <div id="chartContainer" style="margin-top:30px;">
-    <canvas id="votesChart"></canvas>
-  </div>
-</main>
+<div id="results">
+  <!-- 候选人卡片动态生成 -->
+</div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="admin.js?v=20260515"></script>
+<script>
+// Supabase 初始化
+const supabaseUrl = 'https://bhilewmilbhxowxwwyfq.supabase.co';
+const supabaseKey = '你的SupabaseKey';
+const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+const ADMIN_PASSWORD = '123456';
+const resultsDiv = document.getElementById('results');
+const totalVotersSpan = document.getElementById('totalVoters');
+const refreshBtn = document.getElementById('refreshBtn');
+const resetBtn = document.getElementById('resetBtn');
+const manualInput = document.getElementById('manualVoterInput');
+const manualInfo = document.getElementById('manualInfo');
+const confirmVoterBtn = document.getElementById('confirmVoterBtn');
+
+// 登录
+function login(){
+  const password = document.getElementById('adminPassword').value;
+  if(password===ADMIN_PASSWORD){
+    document.getElementById('loginOverlay').style.display='none';
+    loadResults();
+  }else{
+    alert('密码错误');
+  }
+}
+
+// 刷新数据
+refreshBtn.addEventListener('click', loadResults);
+
+// 手动输入参与人数
+confirmVoterBtn.addEventListener('click', ()=>{
+  const val = Number(manualInput.value);
+  if(val>0){
+    const actualVoters = Number(totalVotersSpan.textContent);
+    const rate = Math.min(100,(actualVoters/val*100).toFixed(1));
+    manualInfo.textContent = `实际投票人数：${actualVoters}，参与率：${rate}%`;
+  }else{
+    manualInfo.textContent='';
+  }
+});
+
+// 重置投票
+resetBtn.addEventListener('click', async ()=>{
+  if(!confirm('确认要复位所有序列号和清空投票数据吗？')) return;
+  await db.from('votes').delete().neq('id',0);
+  await db.from('codes').update({used:false,user_code:null});
+  alert('已复位完成！');
+  loadResults();
+});
+
+// 加载统计
+async function loadResults(){
+  resultsDiv.innerHTML='';
+  const {data:voterData,error:voterError}=await db.from('votes').select('user_code');
+  if(voterError){alert('获取总参与人数失败：'+voterError.message);return;}
+  const uniqueUsers=[...new Set(voterData.map(v=>v.user_code))];
+  totalVotersSpan.textContent=uniqueUsers.length;
+
+  const {data:candidates,error:candidatesError}=await db.from('candidates').select('*');
+  if(candidatesError){alert('获取候选人失败：'+candidatesError.message);return;}
+
+  const groups={};
+  for(const c of candidates){
+    if(!groups[c.position]) groups[c.position]=[];
+    groups[c.position].push(c);
+  }
+
+  for(const pos in groups){
+    const groupDiv=document.createElement('div');
+    groupDiv.className='candidate-group';
+    groupDiv.innerHTML=`<div class="group-title">${pos}</div>`;
+    for(const c of groups[pos]){
+      const {data:votes}=await db.from('votes').select('*').eq('candidate_id',Number(c.id));
+      const voteCount=votes?votes.length:0;
+      const rate=uniqueUsers.length>0?Math.round(voteCount/uniqueUsers.length*100):0;
+
+      const card=document.createElement('div');
+      card.className='candidate-card';
+      card.innerHTML=`
+        <div class="candidate-info">
+          <div class="name">${c.name}</div>
+          <div class="position">${c.position}</div>
+        </div>
+        <div class="candidate-stats">
+          <div class="votes">${voteCount}票</div>
+          <div class="rate ${rate>=50?'green':'red'}">${rate}%</div>
+        </div>
+      `;
+      groupDiv.appendChild(card);
+    }
+    resultsDiv.appendChild(groupDiv);
+  }
+}
+
+window.addEventListener('DOMContentLoaded',()=>{document.getElementById('loginOverlay').style.display='flex';});
+</script>
 </body>
 </html>
