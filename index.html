@@ -118,7 +118,7 @@ header {
     <button onclick="login()">登录</button>
   </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <header>中干竞聘投票满屏后台</header>
 
 <div id="manualInput">
@@ -128,6 +128,7 @@ header {
   <span id="manualInfo"></span>
   <button id="resetBtn">复位投票</button>
   <button id="refreshBtn">刷新数据</button>
+  <button id="exportExcelBtn">导出 Excel</button>
 </div>
 
 <div id="summary">
@@ -219,6 +220,42 @@ async function loadResults(){
     resultsDiv.appendChild(groupDiv);
   }
 }
+
+const exportExcelBtn = document.getElementById('exportExcelBtn');
+
+exportExcelBtn.addEventListener('click', async ()=>{
+  const {data:candidates} = await db.from('candidates').select('*');
+  const {data:voterData} = await db.from('votes').select('candidate_id,user_code');
+
+  const uniqueUsers=[...new Set(voterData.map(v=>v.user_code))];
+  const totalVoters = uniqueUsers.length;
+
+  const groups = {};
+  for(const c of candidates){
+    if(!groups[c.position]) groups[c.position] = [];
+    groups[c.position].push(c);
+  }
+
+  const sheetData = [];
+  for(const pos in groups){
+    for(const c of groups[pos]){
+      const voteCount = voterData.filter(v=>v.candidate_id === c.id).length;
+      const rate = totalVoters>0 ? Math.round(voteCount/totalVoters*100) : 0;
+      sheetData.push({
+        '岗位': pos,
+        '候选人': c.name,
+        '票数': voteCount,
+        '得票率(%)': rate
+      });
+    }
+  }
+
+  // 生成 Excel
+  const ws = XLSX.utils.json_to_sheet(sheetData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '投票统计');
+  XLSX.writeFile(wb, '投票统计.xlsx');
+});
 
 window.addEventListener('DOMContentLoaded',()=>{document.getElementById('loginOverlay').style.display='flex';});
 </script>
