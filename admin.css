@@ -12,14 +12,12 @@ header {
   margin-bottom: 20px;
 }
 
-header h1 {
-  font-size: 1.5em;
-  color: #1e3a8a;
-}
+header h1 { font-size: 1.5em; color: #1e3a8a; }
 
-header button {
+.header-btns button {
   padding: 8px 15px;
   font-size: 1em;
+  margin-left: 10px;
   border-radius: 6px;
   border: none;
   background-color: #2563eb;
@@ -27,57 +25,64 @@ header button {
   cursor: pointer;
 }
 
-header button:hover {
-  background-color: #1e40af;
+.header-btns button:hover { background-color: #1e40af; }
+
+#manualInput {
+  margin-bottom: 15px;
 }
 
-#summary {
-  text-align: center;
-  font-size: 1.2em;
-  margin-bottom: 20px;
+#manualInput input { width: 80px; padding: 5px; margin-left: 5px; }
+
+#manualInput button {
+  padding: 5px 10px;
+  margin-left: 5px;
+  border-radius: 4px;
+  border: none;
+  background-color: #16a34a;
+  color: white;
+  cursor: pointer;
 }
+
+#manualInput button:hover { background-color: #15803d; }
+
+#summary { text-align: center; font-size: 1.2em; margin-bottom: 20px; }
+
+.candidate-group { margin-bottom: 25px; }
+
+.group-title { font-weight: bold; font-size: 1.1em; margin-bottom: 8px; color:#1e3a8a; }
 
 .candidate-card {
   background: white;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.candidate-info {
-  display: flex;
-  flex-direction: column;
-}
+.candidate-info { display: flex; flex-direction: column; }
 
-.candidate-info .name {
-  font-weight: bold;
-  font-size: 1.1em;
-}
+.candidate-info .name { font-weight: bold; font-size: 1em; }
+.candidate-info .position { font-size: 0.9em; color: #555; }
 
-.candidate-info .position {
-  font-size: 0.95em;
-  color: #555;
-}
-
-.candidate-stats {
-  display: flex;
-  align-items: center;
-}
-
-.candidate-stats .votes {
-  margin-right: 15px;
-}
-
+.candidate-stats { display: flex; align-items: center; }
+.candidate-stats .votes { margin-right: 15px; }
 .candidate-stats .rate {
-  font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: white;
+  font-weight: bold; padding: 4px 8px; border-radius: 4px; color:white;
 }
+.rate.green { background-color: #16a34a; } 
+.rate.red { background-color: #dc2626; } 
 
-.rate.green { background-color: #16a34a; } /* 高于50% */
-.rate.red { background-color: #dc2626; }   /* 低于50% */
+/* 登录遮罩 */
+#loginOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.85); display:flex; justify-content:center; align-items:center;
+  z-index: 9999;
+}
+.login-box { background:white; padding:30px; border-radius:12px; width:300px; text-align:center; }
+.login-box h2 { margin-bottom:20px; }
+.login-box input { width:100%; padding:12px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+.login-box button { width:100%; padding:12px; border:none; border-radius:6px; background:#2563eb; color:white; font-size:16px; cursor:pointer; }
+.login-box button:hover { background:#1e40af; }

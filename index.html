@@ -3,30 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>投票统计后台</title>
-<link rel="stylesheet" href="admin.css?v=20260513">
-<!-- Chart.js CDN -->
+<title>中干竞聘投票后台</title>
+<link rel="stylesheet" href="admin.css?v=20260515">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
+
+<!-- 登录遮罩 -->
 <div id="loginOverlay">
   <div class="login-box">
     <h2>后台登录</h2>
-    <input
-      type="password"
-      id="adminPassword"
-      placeholder="请输入后台密码">
-    <button onclick="login()">
-      登录
-    </button>
+    <input type="password" id="adminPassword" placeholder="请输入后台密码">
+    <button onclick="login()">登录</button>
   </div>
 </div>
+
 <header>
   <h1>中干竞聘投票统计后台</h1>
-  <button id="refreshBtn">刷新数据</button>
+  <div class="header-btns">
+    <button id="refreshBtn">刷新数据</button>
+    <button id="resetBtn">复位投票</button>
+  </div>
 </header>
+
 <main>
+  <div id="manualInput">
+    <label>手动输入参与人数：</label>
+    <input type="number" id="manualVoterInput" min="0">
+    <button id="confirmVoterBtn">确认</button>
+    <span id="manualInfo"></span>
+  </div>
+
   <div id="summary">
     <p>总参与人数：<span id="totalVoters">0</span></p>
   </div>
@@ -41,6 +49,6 @@
 </main>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="admin.js?v=20260514"></script>
+<script src="admin.js?v=20260515"></script>
 </body>
 </html>
