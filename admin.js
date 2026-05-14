@@ -72,7 +72,7 @@ async function loadResults() {
     const { data: votes } = await db
       .from('votes')
       .select('*')
-      .eq('candidate_id', c.id);
+      .eq('candidate_id',  Number(c.id));
     const voteCount = votes ? votes.length : 0;
     const rate = totalVoters > 0 ? Math.round((voteCount / totalVoters) * 100) : 0;
     stats.push({
