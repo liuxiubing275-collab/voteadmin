@@ -13,7 +13,6 @@ html, body {
   overflow:hidden;
 }
 
-/* 顶部标题 */
 header {
   text-align:center;
   padding:10px;
@@ -22,7 +21,6 @@ header {
   font-size:2em;
 }
 
-/* 手动输入区域 */
 #manualInput {
   display:flex;
   justify-content:center;
@@ -32,15 +30,11 @@ header {
   flex-wrap:wrap;
 }
 #manualInput input { width:100px; padding:5px; font-size:1em; }
-#manualInput button {
-  padding:5px 10px; border-radius:4px; border:none;
-  background:#16a34a; color:white; cursor:pointer;
-}
+#manualInput button { padding:5px 10px; border-radius:4px; border:none; background:#16a34a; color:white; cursor:pointer; }
 #manualInput button:hover { background:#15803d; }
 
 #summary { text-align:center; font-size:1.2em; margin-bottom:5px; }
 
-/* 满屏岗位布局 */
 #results {
   display:grid;
   grid-template-columns: repeat(5, 1fr);
@@ -51,7 +45,6 @@ header {
   overflow:hidden;
 }
 
-/* 每个岗位组 */
 .candidate-group {
   background:#fff;
   border-radius:8px;
@@ -62,7 +55,6 @@ header {
   box-shadow:0 1px 4px rgba(0,0,0,0.1);
 }
 
-/* 岗位标题 */
 .group-title {
   text-align:center;
   font-weight:bold;
@@ -71,7 +63,6 @@ header {
   color:#1e3a8a;
 }
 
-/* 每个候选人卡片 */
 .candidate-card {
   background:#e8f0fe;
   border-radius:6px;
@@ -82,10 +73,12 @@ header {
   flex-direction:column;
   justify-content:center;
   align-items:center;
+  text-align:center;
+  height:100px;
+  box-sizing:border-box;
   font-size: calc(10px + 0.5vw);
 }
 
-/* 投票信息 */
 .candidate-stats {
   display:flex;
   gap:5px;
@@ -96,7 +89,6 @@ header {
 .rate.green{ background:#16a34a; }
 .rate.red{ background:#dc2626; }
 
-/* 登录遮罩 */
 #loginOverlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
   background: rgba(0,0,0,0.85);
@@ -114,7 +106,6 @@ header {
 </head>
 <body>
 
-<!-- 登录遮罩 -->
 <div id="loginOverlay">
   <div class="login-box">
     <h2>后台登录</h2>
@@ -142,7 +133,7 @@ header {
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-// ================= Supabase 初始化
+// Supabase 初始化
 const supabaseUrl='https://bhilewmilbhxowxwwyfq.supabase.co';
 const supabaseKey='sb_publishable_Qnzwloea8NOgqdtkhDVUEw_g_iIPMcD';
 const db = supabase.createClient(supabaseUrl,supabaseKey);
@@ -156,7 +147,6 @@ const manualInput=document.getElementById('manualVoterInput');
 const manualInfo=document.getElementById('manualInfo');
 const confirmVoterBtn=document.getElementById('confirmVoterBtn');
 
-// 登录
 function login(){
   const password=document.getElementById('adminPassword').value;
   if(password===ADMIN_PASSWORD){
@@ -165,10 +155,7 @@ function login(){
   }else{alert('密码错误');}
 }
 
-// 刷新
 refreshBtn.addEventListener('click', loadResults);
-
-// 手动输入参与人数
 confirmVoterBtn.addEventListener('click', ()=>{
   const val=Number(manualInput.value);
   if(val>0){
@@ -178,7 +165,6 @@ confirmVoterBtn.addEventListener('click', ()=>{
   }else{manualInfo.textContent='';}
 });
 
-// 重置投票
 resetBtn.addEventListener('click',async ()=>{
   if(!confirm('确认要复位所有序列号和清空投票数据吗？')) return;
   await db.from('votes').delete().neq('id',0);
@@ -187,18 +173,14 @@ resetBtn.addEventListener('click',async ()=>{
   loadResults();
 });
 
-// 加载统计
 async function loadResults(){
   resultsDiv.innerHTML='';
-  const {data:voterData,error:voterError}=await db.from('votes').select('user_code');
-  if(voterError){alert('获取总参与人数失败：'+voterError.message);return;}
+  const {data:voterData}=await db.from('votes').select('user_code');
   const uniqueUsers=[...new Set(voterData.map(v=>v.user_code))];
   totalVotersSpan.textContent=uniqueUsers.length;
 
-  const {data:candidates,error:candidatesError}=await db.from('candidates').select('*');
-  if(candidatesError){alert('获取候选人失败：'+candidatesError.message);return;}
+  const {data:candidates}=await db.from('candidates').select('*');
 
-  // 分组 15 个岗位
   const groups={};
   for(const c of candidates){
     if(!groups[c.position]) groups[c.position]=[];
@@ -219,7 +201,6 @@ async function loadResults(){
       card.innerHTML=`
         <div class="candidate-info">
           <div class="name">${c.name}</div>
-          <div class="position">${c.position}</div>
         </div>
         <div class="candidate-stats">
           <div class="votes">${voteCount}票</div>
