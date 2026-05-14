@@ -5,7 +5,6 @@ const supabaseUrl = 'https://bhilewmilbhxowxwwyfq.supabase.co';
 const supabaseKey = 'sb_publishable_Qnzwloea8NOgqdtkhDVUEw_g_iIPMcD'; // 只用公开 key
 const db = supabase.createClient(supabaseUrl, supabaseKey);
 
-
 // 后台密码
 const ADMIN_PASSWORD = '123456';
 
@@ -35,27 +34,18 @@ refreshBtn.addEventListener('click', loadResults);
 confirmVoterBtn.addEventListener('click', ()=>{
   const val = Number(manualInput.value);
   if(val>0){
-    manualInfo.textContent = `参与人数：${val}，参与率：${votesChart? (val/totalVotersSpan.textContent*100).toFixed(1)+'%' : 'N/A'}`;
-  }else{
-    confirmVoterBtn.addEventListener('click', ()=>{
-  const val = Number(manualInput.value);
-  if(val>0){
-    const actualVoters = Number(totalVotersSpan.textContent); // 实际投票人数
-    const rate = Math.min(100,(actualVoters/val*100).toFixed(1));
+    const actualVoters = Number(totalVotersSpan.textContent);
+    const rate = Math.min(100, (actualVoters/val*100).toFixed(1));
     manualInfo.textContent = `实际投票人数：${actualVoters}，参与率：${rate}%`;
   }else{
     manualInfo.textContent = '';
-  }
-});
   }
 });
 
 // 重置投票数据 + 序列号
 resetBtn.addEventListener('click', async ()=>{
   if(!confirm('确认要复位所有序列号和清空投票数据吗？')) return;
-  // 清空 votes
   await db.from('votes').delete().neq('id',0);
-  // 重置 codes 表
   await db.from('codes').update({used:false, user_code:null});
   alert('已复位完成！');
   loadResults();
