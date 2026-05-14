@@ -18,7 +18,7 @@ header {
   padding:10px;
   background:#1e3a8a;
   color:white;
-  font-size:2em;
+  font-size:3vh; /* 标题字号随屏幕高度 */
 }
 
 #manualInput {
@@ -28,45 +28,48 @@ header {
   gap:10px;
   margin:5px 0;
   flex-wrap:wrap;
+  font-size:2vh;
 }
-#manualInput input { width:100px; padding:5px; font-size:1em; }
-#manualInput button { padding:5px 10px; border-radius:4px; border:none; background:#16a34a; color:white; cursor:pointer; }
+#manualInput input { width:80px; padding:5px; font-size:2vh; }
+#manualInput button { padding:5px 10px; font-size:2vh; border-radius:4px; border:none; background:#16a34a; color:white; cursor:pointer; }
 #manualInput button:hover { background:#15803d; }
 
-#summary { text-align:center; font-size:1.2em; margin-bottom:5px; }
+#summary { text-align:center; font-size:2.5vh; margin-bottom:5px; }
 
 #results {
   display:grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(3, auto);
+  grid-template-rows: repeat(3, 1fr);
   gap: 10px;
-  height: calc(100% - 140px);
+  height: calc(100% - 150px);
   padding:5px;
-  overflow:hidden;
 }
 
+/* 每个岗位组 */
 .candidate-group {
   background:#fff;
   border-radius:8px;
   padding:5px;
   display:flex;
   flex-direction:column;
+  justify-content:flex-start;
   height:100%;
   box-shadow:0 1px 4px rgba(0,0,0,0.1);
 }
 
+/* 岗位标题 */
 .group-title {
   text-align:center;
   font-weight:bold;
-  font-size: calc(14px + 0.8vw);
+  font-size:2.5vh; /* 标题随屏幕高度自适应 */
   margin-bottom:5px;
   color:#1e3a8a;
 }
 
+/* 候选人卡片 */
 .candidate-card {
   background:#e8f0fe;
   border-radius:6px;
-  padding:5px;
   margin-bottom:4px;
   flex:1;
   display:flex;
@@ -74,21 +77,23 @@ header {
   justify-content:center;
   align-items:center;
   text-align:center;
-  height:100px;
+  height: calc((100% - 3vh)/3); /* 每个岗位内均分高度 */
   box-sizing:border-box;
-  font-size: calc(10px + 0.5vw);
+  font-size:2.5vh; /* 字号随屏幕高度 */
 }
 
 .candidate-stats {
   display:flex;
   gap:5px;
-  margin-top:3px;
+  margin-top:2px;
+  font-size:2vh; /* 投票数与百分比随屏幕自适应 */
 }
 .candidate-stats .votes{}
 .candidate-stats .rate{ font-weight:bold; padding:2px 6px; border-radius:4px; color:white; }
 .rate.green{ background:#16a34a; }
 .rate.red{ background:#dc2626; }
 
+/* 登录遮罩 */
 #loginOverlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
   background: rgba(0,0,0,0.85);
@@ -133,7 +138,7 @@ header {
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-// Supabase 初始化
+// 初始化 Supabase
 const supabaseUrl='https://bhilewmilbhxowxwwyfq.supabase.co';
 const supabaseKey='sb_publishable_Qnzwloea8NOgqdtkhDVUEw_g_iIPMcD';
 const db = supabase.createClient(supabaseUrl,supabaseKey);
@@ -156,6 +161,7 @@ function login(){
 }
 
 refreshBtn.addEventListener('click', loadResults);
+
 confirmVoterBtn.addEventListener('click', ()=>{
   const val=Number(manualInput.value);
   if(val>0){
@@ -191,6 +197,7 @@ async function loadResults(){
     const groupDiv=document.createElement('div');
     groupDiv.className='candidate-group';
     groupDiv.innerHTML=`<div class="group-title">${pos}</div>`;
+
     for(const c of groups[pos]){
       const {data:votes}=await db.from('votes').select('*').eq('candidate_id',Number(c.id));
       const voteCount=votes?votes.length:0;
