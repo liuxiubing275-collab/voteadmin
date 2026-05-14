@@ -10,11 +10,22 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
+<div id="loginOverlay">
+  <div class="login-box">
+    <h2>后台登录</h2>
+    <input
+      type="password"
+      id="adminPassword"
+      placeholder="请输入后台密码">
+    <button onclick="login()">
+      登录
+    </button>
+  </div>
+</div>
 <header>
   <h1>中干竞聘投票统计后台</h1>
   <button id="refreshBtn">刷新数据</button>
 </header>
-
 <main>
   <div id="summary">
     <p>总参与人数：<span id="totalVoters">0</span></p>
