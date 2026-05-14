@@ -37,7 +37,16 @@ confirmVoterBtn.addEventListener('click', ()=>{
   if(val>0){
     manualInfo.textContent = `参与人数：${val}，参与率：${votesChart? (val/totalVotersSpan.textContent*100).toFixed(1)+'%' : 'N/A'}`;
   }else{
+    confirmVoterBtn.addEventListener('click', ()=>{
+  const val = Number(manualInput.value);
+  if(val>0){
+    const actualVoters = Number(totalVotersSpan.textContent); // 实际投票人数
+    const rate = Math.min(100,(actualVoters/val*100).toFixed(1));
+    manualInfo.textContent = `实际投票人数：${actualVoters}，参与率：${rate}%`;
+  }else{
     manualInfo.textContent = '';
+  }
+});
   }
 });
 
