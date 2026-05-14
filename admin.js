@@ -2,7 +2,7 @@
 // Supabase 初始化
 // =========================
 const supabaseUrl = 'https://bhilewmilbhxowxwwyfq.supabase.co';
-const supabaseKey = '你的SupabaseKey'; // 只用公开 key
+const supabaseKey = 'sb_publishable_Qnzwloea8NOgqdtkhDVUEw_g_iIPMcD'; // 只用公开 key
 const db = supabase.createClient(supabaseUrl, supabaseKey);
 
 // =========================
