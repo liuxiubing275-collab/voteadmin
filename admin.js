@@ -3,7 +3,7 @@
 // =======================
 
 const supabaseUrl = 'https://bhilewmilbhxowxwwyfq.supabase.co';
-const supabaseKey = '你的KEY';
+const supabaseKey = 'sb_publishable_Qnzwloea8NOgqdtkhDVUEw_g_iIPMcD';
 
 const sb = window.supabase.createClient(
     supabaseUrl,
