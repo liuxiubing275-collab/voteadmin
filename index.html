@@ -172,12 +172,104 @@ confirmVoterBtn.addEventListener('click', ()=>{
   }else{manualInfo.textContent='';}
 });
 
-resetBtn.addEventListener('click',async ()=>{
-  if(!confirm('确认要复位所有序列号和清空投票数据吗？')) return;
-  await db.from('votes').delete().neq('id',0);
-  await db.from('codes').update({used:false,user_code:null});
-  alert('已复位完成！');
-  loadResults();
+const resetBtn = document.getElementById('resetVotesBtn');
+
+resetBtn.addEventListener('click', async () => {
+
+    // 第一次确认
+    const confirm1 = confirm(
+        '确定要清空所有投票数据吗？'
+    );
+
+    if (!confirm1) return;
+
+    // 第二次确认
+    const confirm2 = confirm(
+        '此操作不可恢复！\n\n将执行：\n1. 清空全部投票\n2. 重置全部序列号\n\n是否继续？'
+    );
+
+    if (!confirm2) return;
+
+    try {
+
+        // 显示加载状态
+        resetBtn.disabled = true;
+        resetBtn.innerText = '正在复位...';
+
+        // ========================
+        // 1. 删除 votes 表
+        // ========================
+
+        const { error: deleteError } = await supabase
+            .from('votes')
+            .delete()
+            .neq('id', 0);
+
+        if (deleteError) throw deleteError;
+
+        // ========================
+        // 2. 重置 codes
+        // ========================
+
+        const { error: updateError } = await supabase
+            .from('codes')
+            .update({
+                used: false
+            })
+            .neq('id', 0);
+
+        if (updateError) throw updateError;
+
+        // ========================
+        // 3. 清空前端显示
+        // ========================
+
+        const cards = document.querySelectorAll('.candidate-card');
+
+        cards.forEach(card => {
+
+            const voteEl = card.querySelector('.vote-count');
+            const rateEl = card.querySelector('.vote-rate');
+
+            if (voteEl) voteEl.innerText = '0票';
+            if (rateEl) rateEl.innerText = '0%';
+
+        });
+
+        // 总参与人数
+        const totalEl = document.getElementById('totalVotes');
+
+        if (totalEl) {
+            totalEl.innerText = '0';
+        }
+
+        // ========================
+        // 4. 提示成功
+        // ========================
+
+        alert('全部投票数据已复位成功！');
+
+        // ========================
+        // 5. 自动刷新后台数据
+        // ========================
+
+        if (typeof loadResults === 'function') {
+            loadResults();
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert('复位失败：' + err.message);
+
+    } finally {
+
+        resetBtn.disabled = false;
+        resetBtn.innerText = '复位全部投票';
+
+    }
+
 });
 
 async function loadResults(){
