@@ -42,119 +42,131 @@ async function loadResults() {
 
     try {
 
-        // =======================
+        // ======================
         // 读取候选人
-        // =======================
+        // ======================
 
-        const { data: candidates, error: candidateError } =
-            await sb
-                .from('candidates')
-                .select('*')
-                .order('position', { ascending: true });
+        const candidateRes = await sb
+            .from('candidates')
+            .select('*')
+            .order('position', { ascending: true });
 
-        if (candidateError) throw candidateError;
+        if (candidateRes.error) {
 
-        // =======================
+            console.error(candidateRes.error);
+
+            alert('读取候选人失败');
+
+            return;
+        }
+
+        const candidates = candidateRes.data || [];
+
+        // ======================
         // 读取 votes
-        // =======================
+        // ======================
 
-        const { data: votes, error: voteError } =
-            await sb
-                .from('votes')
-                .select('*');
+        const voteRes = await sb
+            .from('votes')
+            .select('*');
 
-        if (voteError) throw voteError;
+        if (voteRes.error) {
 
-        // =======================
-        // 统计参与人数
-        // =======================
+            console.error(voteRes.error);
+
+            alert('读取投票数据失败');
+
+            return;
+        }
+
+        const votes = voteRes.data || [];
+
+        // ======================
+        // 统计投票人数
+        // ======================
 
         const uniqueCodes = new Set();
 
         votes.forEach(v => {
 
             if (v.code) {
+
                 uniqueCodes.add(v.code);
+
             }
 
         });
 
-        const totalVoteUsers = uniqueCodes.size;
+        const totalVoteUsers =
+            uniqueCodes.size;
 
-        document.getElementById('votedUsers').innerText =
-            totalVoteUsers;
-
-        // =======================
-        // 参与率
-        // =======================
-
-        const totalInput =
-            parseInt(document.getElementById('totalPeople').value) || 0;
-
-        const joinRate =
-            totalInput > 0
-                ? ((totalVoteUsers / totalInput) * 100).toFixed(1)
-                : 0;
-
-        document.getElementById('joinRate').innerText =
-            joinRate + '%';
-
-        // =======================
-        // 统计候选人票数
-        // =======================
+        // ======================
+        // 候选人票数统计
+        // ======================
 
         const voteMap = {};
 
         votes.forEach(v => {
 
             if (!voteMap[v.candidate_id]) {
+
                 voteMap[v.candidate_id] = 0;
+
             }
 
             voteMap[v.candidate_id]++;
 
         });
 
-        // =======================
-        // 岗位分组
-        // =======================
+        // ======================
+        // 分组岗位
+        // ======================
 
         const positionMap = {};
 
         candidates.forEach(c => {
 
             if (!positionMap[c.position]) {
+
                 positionMap[c.position] = [];
+
             }
 
-            const count = voteMap[c.id] || 0;
+            const count =
+                voteMap[c.id] || 0;
 
             const rate =
                 totalVoteUsers > 0
-                    ? ((count / totalVoteUsers) * 100).toFixed(1)
-                    : 0;
+                ? ((count / totalVoteUsers) * 100).toFixed(1)
+                : 0;
 
             positionMap[c.position].push({
+
                 ...c,
+
                 votes: count,
+
                 rate: rate
+
             });
 
         });
 
-        // =======================
-        // 候选人排序
-        // =======================
+        // ======================
+        // 排序
+        // ======================
 
-        Object.keys(positionMap).forEach(key => {
+        Object.keys(positionMap).forEach(position => {
 
-            positionMap[key].sort((a, b) => b.votes - a.votes);
+            positionMap[position].sort(
+                (a, b) => b.votes - a.votes
+            );
 
         });
 
-        // =======================
-        // 渲染页面
-        // =======================
+        // ======================
+        // 渲染
+        // ======================
 
         const container =
             document.getElementById('resultsContainer');
@@ -163,9 +175,11 @@ async function loadResults() {
 
         Object.keys(positionMap).forEach(position => {
 
-            const section = document.createElement('div');
+            const section =
+                document.createElement('div');
 
-            section.className = 'position-section';
+            section.className =
+                'position-section';
 
             let html = `
                 <div class="position-title">
@@ -179,8 +193,8 @@ async function loadResults() {
 
                 const color =
                     parseFloat(c.rate) >= 50
-                        ? '#16a34a'
-                        : '#dc2626';
+                    ? '#16a34a'
+                    : '#dc2626';
 
                 html += `
                     <div class="candidate-card">
@@ -213,11 +227,25 @@ async function loadResults() {
 
         });
 
+        // ======================
+        // 显示投票人数
+        // ======================
+
+        const votedUsersEl =
+            document.getElementById('votedUsers');
+
+        if (votedUsersEl) {
+
+            votedUsersEl.innerText =
+                totalVoteUsers;
+
+        }
+
     } catch (err) {
 
         console.error(err);
 
-        alert('加载数据失败：' + err.message);
+        alert('后台加载失败：' + err.message);
 
     }
 
